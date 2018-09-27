@@ -4,7 +4,7 @@ author: "Shan Jiang"
 date: "9/27/2018"
 output: html_document
 ---
-Lecture Tips
+## Lecture Tips
 *Dataviz tips*:
  * 3D is bad, make sure the color is distinguished from the each other;
  * Never use the pie chart;
@@ -27,14 +27,14 @@ Basic graph components:
 * geoms
 
 Advanced graph components:
-* facets
-* scales
-* statistics
+*facets
+*scales
+*statistics
 
 A graph is built by combining these components 
 
-
 **Git repo for visualizing the data** 
+
 ```{r setup, include=FALSE}
 library(tidyverse)
 library(ggridges)
@@ -51,8 +51,68 @@ weather_df =
     tmin = tmin / 10,
     tmax = tmax / 10) %>%
   select(name, id, everything())
-weather_df
 
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+* the t means temp and is measured in celsuis degree.
+
+#start a plot
+```{r}
+ggplot(weather_df, aes(x = tmin, y = tmax)) + 
+  geom_point()
+```
+* you can pipe directly and don't need to sepcify about the data name
+```{r}
+weather_df %>% 
+  filter(name == "CentralPark_NY") %>% 
+  ggplot(aes(x = tmin, y = tmax)) %>% +
+  geom_point()
+```
+## More Plot options
+```{r}
+plot_weather = 
+  weather_df %>%
+  ggplot(aes(x = tmin, y = tmax)) 
+
+plot_weather + geom_point()
+ggplot(weather_df, aes(x = tmin, y = tmax)) + 
+  geom_point(aes(color = name))
+```
+## Add a geom _line for the graph
+```{r}
+ggplot(weather_df, aes(x = tmin, y = tmax)) + 
+  geom_point(aes(color = name), alpha = .5) +
+  geom_smooth(se = FALSE)
+geom_smooth()
+```
+* alpha blending level - transparent/ not transparent 
+
+```{r}
+ggplot(weather_df, aes(x = tmin, y = tmax)) + 
+  geom_point(aes(color = name), alpha = .2) +
+  geom_smooth(se = FALSE)
+```
+* Create every line not a global line   
+```{r}
+ggplot(weather_df, aes(x = tmin, y = tmax)) + 
+  geom_point(aes(color = name), alpha = .1) +
+  geom_smooth(aes(color = name),se = FALSE)
+```
+Facetting...
+```{r}
+ggplot(weather_df, aes(x = tmin, y = tmax)) + 
+  geom_point(aes(color = name), alpha = .1) +
+  geom_smooth(aes(color = name), se = FALSE) +
+ facet_grid(~ name)
+```
+
+
+
+
+
+
+
+
+
 
