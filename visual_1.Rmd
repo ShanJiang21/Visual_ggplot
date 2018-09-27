@@ -1,0 +1,58 @@
+---
+title: "Visualization_1"
+author: "Shan Jiang"
+date: "9/27/2018"
+output: html_document
+---
+Lecture Tips
+*Dataviz tips*:
+ * 3D is bad, make sure the color is distinguished from the each other;
+ * Never use the pie chart;
+ * Use Color to highlight groups;
+ * Do use the Common Axes;
+ * Good figures are not necessarily the publication quality pictures;
+Why ggplot:
+ * "Relative" is compared with the base R graphics;
+ * Much easier and much more convinient; 
+ * Learning curve for ggplot2/lattice(another package) is needed;
+learning ggplot:
+ * Stackoverflow;
+Using ggplot:
+ * data tidy issue is linked affects the ability to visualize 
+ 
+gg = grammar of graphics
+Basic graph components:
+* data
+* aesthetic mappings
+* geoms
+
+Advanced graph components:
+* facets
+* scales
+* statistics
+
+A graph is built by combining these components 
+
+
+**Git repo for visualizing the data** 
+```{r setup, include=FALSE}
+library(tidyverse)
+library(ggridges)
+library(rnoaa)
+weather_df = 
+  rnoaa::meteo_pull_monitors(c("USW00094728", "USC00519397", "USS0023B17S"),
+                      var = c("PRCP", "TMIN", "TMAX"), 
+                      date_min = "2017-01-01",
+                      date_max = "2017-12-31") %>%
+  mutate(
+    name = recode(id, USW00094728 = "CentralPark_NY", 
+                      USC00519397 = "Waikiki_HA",
+                      USS0023B17S = "Waterhole_WA"),
+    tmin = tmin / 10,
+    tmax = tmax / 10) %>%
+  select(name, id, everything())
+weather_df
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
