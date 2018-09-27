@@ -106,6 +106,75 @@ ggplot(weather_df, aes(x = tmin, y = tmax)) +
   geom_smooth(aes(color = name), se = FALSE) +
  facet_grid(~ name)
 ```
+A more interesting plot / use the date as x.
+```{r}
+ggplot(weather_df, aes(x = date, y= tmax, color = name, size = prcp)) +
+  geom_point() +
+  geom_smooth(se = FALSE)+
+  facet_grid(~ name)
+```
+# Create a Geom_hex
+```{r}
+ggplot(weather_df, aes(x = tmax, y = tmin)) + 
+  geom_hex()
+```
+**Tricks in color and definitions for variables in aes**
+```{r}
+ggplot(weather_df) + geom_point(aes(x = tmax, y = tmin), color = "blue")
+ggplot(weather_df) + geom_point(aes(x = tmax, y = tmin, color = "blue"))
+```
+
+
+##univariate plots
+```{r}
+ggplot(weather_df, aes(x = tmax)) +
+  geom_histogram()
+```
+
+```{r}
+ggplot(weather_df, aes(x = tmax)) +
+  geom_histogram()+
+  facet_grid(~name)
+```
+Hist in smooth
+```{r}
+ggplot(weather_df, aes(x = tmax, fill = name)) +
+  geom_density(alpha = .5)
+```
+Boxplots!!
+```{r}
+ggplot(weather_df, aes(x = tmax, y =tmax, fill = name)) +
+  geom_boxplot(alpha = .5) 
+```
+
+* violin plots for group comparison 
+```{r}
+ggplot(weather_df, aes(x = tmin, y = tmax, fill = name)) +
+  geom_violin(alpha = .5) 
+```
+ridges plot
+```{r}
+ggplot(weather_df, aes(x = tmax, y = name)) + 
+  geom_density_ridges(scale = .85)
+```
+## gg save for saving the document 
+```{r}
+weather_plot = ggplot(weather_df, aes(x = tmax, y = name)) + 
+  geom_density_ridges(scale = .85)
+ggsave("weather plot.png", weather_plot, width = 8, height = 5)
+```
+
+* adjust the file size 
+```{r}
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+```
+
+
+
 
 
 
