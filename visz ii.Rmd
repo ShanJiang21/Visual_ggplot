@@ -224,7 +224,7 @@ weather_df %>%
 * order makes it easy for  categorial  variable, voilin are all increasing/ decreasing. 
 
 
-## data challenging 
+## Advanced tidying: data challenging: from long data to wide data;
 ```{r}
 weather_df %>%
   select(name, tmax, tmin) %>% 
