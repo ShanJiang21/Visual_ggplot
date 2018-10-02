@@ -1,0 +1,208 @@
+---
+title: "Visual 2"
+author: "Shan Jiang"
+date: "10/2/2018"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+```
+
+## Revisiting the examples in the last course
+make a bunch of plots!
+
+```{r}
+library(tidyverse)
+# import the data.
+weather_df = 
+  rnoaa::meteo_pull_monitors(c("USW00094728", "USC00519397", "USS0023B17S"),
+                      var = c("PRCP", "TMIN", "TMAX"), 
+                      date_min = "2017-01-01",
+                      date_max = "2017-12-31") %>%
+  mutate(
+    name = recode(id, USW00094728 = "CentralPark_NY", 
+                      USC00519397 = "Waikiki_HA",
+                      USS0023B17S = "Waterhole_WA"),
+    tmin = tmin / 10,
+    tmax = tmax / 10) %>%
+  select(name, id, everything())
+weather_df
+```
+Make a violin plot.
+```{r}
+ggplot(weather_df, aes(y = prcp  , x = name )) +
+  geom_violin()
+```
+
+Make a boxplot is more suitable.
+```{r}
+ggplot(weather_df, aes(y = prcp  , x = name )) +
+  geom_boxplot()
+```
+
+More information on the density graph.
+```{r}
+weather_df %>% 
+  filter(prcp > 0 ) %>% 
+  ggplot(weather_df, aes(x = prcp, fill = name )) +
+  geom_density(alpha = .5)
+```
+## start a plot
+
+First scatter plot; Add labels.
+```{r}
+ggplot(weather_df, aes(x = tmin, y = tmax))+
+  geom_point(aes(color=name),alpha = .5) +
+  geom_smooth(se = FALSE) +
+  labs(
+    title = "Temperature plot",
+    x = "Minimum daily temperature (C)",
+    y = "Maxiumum daily temperature (C)",
+    caption = "Data from the rnoaa package"
+  )
+```
+
+Tick marks and labels...
+```{r}
+ggplot(weather_df, aes(x = tmin, y = tmax))+
+  geom_point(aes(color=name),alpha = .5) +
+  geom_smooth(se = FALSE) +
+  labs(
+    title = "Temperature plot",
+    x = "Minimum daily temperature (C)",
+    y = "Maxiumum daily temperature (C)",
+    caption = "Data from the rnoaa package"
+  ) +  ##labels can only use characters
+  scale_x_continuous(
+    breaks = c(-15, 0, 15),
+    labels = c("-15ºc", "0ºc", "15ºc"),
+    limits = c(-29, 40)
+  ) + ## position and location of graph on the axis 
+  scale_y_continuous(
+    position = "right",
+    trans = "sqrt" 
+  )
+
+```
+# colors and themes
+Adjust color 
+```{r}
+
+ggplot(weather_df, aes(x = tmin, y = tmax))+
+  geom_point(aes(color=name),alpha = .5) +
+  geom_smooth(se = FALSE) +
+  labs(
+    title = "Temperature plot",
+    x = "Minimum daily temperature (C)",
+    y = "Maxiumum daily temperature (C)",
+    caption = "Data from the rnoaa package"
+  ) +  ## scale color to look at
+  scale_color_hue(
+    name = "Location", ## name for tuli
+    h = c(100, 350),
+    l = 50 )
+```
+```{r}
+ggplot(weather_df, aes(x = tmin, y = tmax))+
+  geom_point(aes(color=name),alpha = .5) +
+  geom_smooth(se = FALSE) +
+  labs(
+    title = "Temperature plot",
+    x = "Minimum daily temperature (C)",
+    y = "Maxiumum daily temperature (C)",
+    caption = "Data from the rnoaa package"
+  ) +  ## scale color to look at
+  viridis::scale_color_viridis(
+    name = "Location", 
+    discrete = TRUE
+  )+
+  theme(legend.position = "bottom")
+## continuous as defalut, change it
+```
+
+## Themes
+```{r}
+ggplot(weather_df, aes(x = tmin, y = tmax))+
+  geom_point(aes(color=name),alpha = .5) +
+  geom_smooth(se = FALSE) +
+  labs(
+    title = "Temperature plot",
+    x = "Minimum daily temperature (C)",
+    y = "Maxiumum daily temperature (C)",
+    caption = "Data from the rnoaa package"
+  ) +  ## scale color to look at
+  viridis::scale_color_viridis(
+    name = "Location", 
+    discrete = TRUE
+  )+ 
+  theme_bw()+
+  theme(legend.position = "bottom")
+## We have goot classic themes and also other themes, they just change the theme of the graph.
+## theme_bw would overwrite everything after you!
+```
+* For the color = name, including the color = name in the ggplot, then would get three different lines, but for geom_smooth, it would just be the one line.
+
+```{r}
+ggplot(weather_df, aes(x = date, y = tmax, color = name)) + 
+  geom_smooth(se = FALSE) +
+  labs(
+    title="Daily Max temperature ",
+    x = "Date",
+    y = "Temperature(ºc)",
+    caption = "Data from moaa package")+ 
+  viridis::scale_color_viridis(
+    name = "Location", 
+    discrete = TRUE
+  )+ 
+   theme(legend.position = "bottom")
+```
+## Arguments to `geom_*`
+```{r}
+centralpark_df <- weather_df %>%  filter(name == "CentralPark_NY")
+wakiki_df <-  weather_df %>%  filter(name == "Waikiki_HA")
+
+# ADDing a layer = add a new data set for the graph
+ggplot(wakiki_df, aes(x = date, y= tmax)) +
+  geom_point() +
+  geom_line(data = centralpark_df)
+# The same type of graph, like both are points are all work together.
+```
+## Patchwork
+
+```{r}
+devtools::install_github("thomasp85/patchwork")
+```
+
+* Individually and stack them, collect the plots. 
+plot/ box/ his/ combination as patchwork. Three different panels. 
+* facet ~ name means the same panel using the same type of graph. 
+Repeat all the graph.
+```{r}
+tmax_tmin_p = ggplot(weather_df, aes(x = tmax, y = tmin, color = name)) + 
+  geom_point(alpha = .5) +
+  theme(legend.position = "none")
+
+prcp_dens_p = weather_df %>% 
+  filter(prcp > 0) %>% 
+  ggplot(aes(x = prcp, fill = name)) + 
+  geom_density(alpha = .5) + 
+  theme(legend.position = "none")
+
+tmax_date_p = ggplot(weather_df, aes(x = date, y = tmax, color = name)) + 
+  geom_point(alpha = .5) +
+  geom_smooth(se = FALSE) + 
+  theme(legend.position = "bottom")
+```
+# Patchwork: under development, then we can combine the graph.
+```{r}
+library(patchwork)
+tmax_date_p + tmax_tmin_p / prcp_dens_p 
+```
+
+
+
